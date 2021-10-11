@@ -1,0 +1,371 @@
+
+
+Advance Database
+Assignment - 4 
+
+
+
+Name 	: SHUBHAM SHANKAR
+UTA ID	: 1001761068
+
+
+
+
+https://gibboweb.azurewebsites.net/
+
+==============================================================================================================================================================================
+
+Sample queries might be:
+From the quake dataset, show the number of quakes for magnitude below 1, 1 to 2,
+2 to 3, up to magnitude 5. Show a Pie Chart with each pie slice in a different color,
+with labels (totals) outside each pie slice.
+Perhaps a bar chart (horizontal bars or vertical bars) is easier to understand.
+Perhaps putting the totals inside each pie slice (or bar) is better.
+What would a graph of magnitude against depth for the 100 recent quakes look like?
+(point chart or scatter chart)
+
+
+Answer : 
+
+----------------- app.py ------------------------
+
+@app.route('/assignment4pie', methods=['GET','POST'])
+def assignment4pie():
+    sql1 = " SELECT count(mag) from quake where mag < 1 ; "
+    sql2 = " SELECT count(mag) from quake where mag BETWEEN 1 and 2  ; "
+    sql3 = " SELECT count(mag) from quake where mag BETWEEN 2 and 3  ; "
+    sql4 = " SELECT count(mag) from quake where mag < 5 ; "
+    
+    cursor.execute(sql1)
+    result1 = cursor.fetchall()
+    print("result1 is",result1)
+
+    cursor.execute(sql2)
+    result2 = cursor.fetchall()
+    print("result2 is",result2)
+
+    cursor.execute(sql3)
+    result3 = cursor.fetchall()
+    print("result3 is",result3)
+
+    cursor.execute(sql4)
+    result4 = cursor.fetchall()
+    print("result4 is",result4)
+
+    output= [
+          ['condition', 'count(mag)'],
+          ['mag< 1',result1[0][0]],
+          ['mag 1-2',result2[0][0]],
+          ['mag 2-3',result3[0][0]],
+          ['mag <5',result4[0][0]]
+        
+        ]
+   
+
+    return render_template("assignment4pie.html", ans = output)
+
+
+# # Bar Chart
+
+@app.route('/assignment4bar', methods=['GET','POST'])
+def assignment4bar():
+    sql1 = " SELECT count(mag) from quake where mag < 1 ; "
+    sql2 = " SELECT count(mag) from quake where mag BETWEEN 1 and 2  ; "
+    sql3 = " SELECT count(mag) from quake where mag BETWEEN 2 and 3  ; "
+    sql4 = " SELECT count(mag) from quake where mag < 5 ; "
+    
+    cursor.execute(sql1)
+    result1 = cursor.fetchall()
+    print("result1 is",result1)
+
+    cursor.execute(sql2)
+    result2 = cursor.fetchall()
+    print("result2 is",result2)
+
+    cursor.execute(sql3)
+    result3 = cursor.fetchall()
+    print("result3 is",result3)
+
+    cursor.execute(sql4)
+    result4 = cursor.fetchall()
+    print("result4 is",result4)
+
+    output= [
+          ['condition', 'count(mag)'],
+          ['mag< 1',result1[0][0]],
+          ['mag 1-2',result2[0][0]],
+          ['mag 2-3',result3[0][0]],
+          ['mag <5',result4[0][0]]
+        
+        ]
+   
+
+    return render_template("assignment4bar.html", ans = output)
+
+
+
+# # scatter graph
+
+@app.route('/assignment4scatter', methods=['GET','POST'])
+def assignment4scatter():
+    sql1 = " SELECT count(mag) from quake where mag < 1 ; "
+    sql2 = " SELECT count(mag) from quake where mag BETWEEN 1 and 2  ; "
+    sql3 = " SELECT count(mag) from quake where mag BETWEEN 2 and 3  ; "
+    sql4 = " SELECT count(mag) from quake where mag < 5 ; "
+    
+    cursor.execute(sql1)
+    result1 = cursor.fetchall()
+    print("result1 is",result1)
+
+    cursor.execute(sql2)
+    result2 = cursor.fetchall()
+    print("result2 is",result2)
+
+    cursor.execute(sql3)
+    result3 = cursor.fetchall()
+    print("result3 is",result3)
+
+    cursor.execute(sql4)
+    result4 = cursor.fetchall()
+    print("result4 is",result4)
+
+    output= [
+          ['condition', 'count(mag)'],
+          ['mag< 1',result1[0][0]],
+          ['mag 1-2',result2[0][0]],
+          ['mag 2-3',result3[0][0]],
+          ['mag <5',result4[0][0]]
+        
+        ]
+   
+
+    return render_template("assignment4scatter.html", ans = output)
+
+# Line graph
+
+@app.route('/assignment4line', methods=['GET','POST'])
+def assignment4line():
+    sql1 = " SELECT count(mag) from quake where mag < 1 ; "
+    sql2 = " SELECT count(mag) from quake where mag BETWEEN 1 and 2  ; "
+    sql3 = " SELECT count(mag) from quake where mag BETWEEN 2 and 3  ; "
+    sql4 = " SELECT count(mag) from quake where mag < 5 ; "
+    
+    cursor.execute(sql1)
+    result1 = cursor.fetchall()
+    print("result1 is",result1)
+
+    cursor.execute(sql2)
+    result2 = cursor.fetchall()
+    print("result2 is",result2)
+
+    cursor.execute(sql3)
+    result3 = cursor.fetchall()
+    print("result3 is",result3)
+
+    cursor.execute(sql4)
+    result4 = cursor.fetchall()
+    print("result4 is",result4)
+
+    output= [
+          ['condition', 'count(mag)'],
+          ['mag< 1',result1[0][0]],
+          ['mag 1-2',result2[0][0]],
+          ['mag 2-3',result3[0][0]],
+          ['mag <5',result4[0][0]]
+        
+        ]
+   
+
+    return render_template("assignment4line.html", ans = output)
+
+
+
+----------------------------------- -------------------------------- Index.html:  ------------------------- -------------------------------
+
+{% extends "layout.html" %}
+{% block content %}
+
+
+<h2>
+    - Pie Chart
+</h2>
+<form action="/assignment4pie" method="get">
+    <p>Click here to display the Pie chart</p>
+    <input type="submit" value="Pie Chart"><br /><br />
+</form>
+
+<h2>
+     - Bar Chart
+</h2>
+<form action="/assignment4bar" method="get">
+    <p>Click here to display the Bar chart</p>
+    <input type="submit" value="Bar Chart"><br /><br />
+</form>
+
+<h2>
+     - Scatter or Point Chart
+</h2>
+<form action="/assignment4scatter" method="get">
+    <p>Click here to display the Scatter or Point chart</p>
+    <input type="submit" value="Scatter or Point Chart"><br /><br />
+</form>
+
+
+
+<h2>
+    - line chart
+</h2>
+<form action="/assignment4line" method="get">
+    <p>Click here to display the line chart</p>
+    <input type="submit" value="Line Chart"><br /><br />
+</form>
+
+
+
+
+
+{% endblock content %}
+
+
+-------------------------------------------------------------- pie.html --------------------------------------------
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{ans|tojson}});
+
+        var options = {
+          title: 'PIE CHART',
+          is3D: true,
+          pieSliceText: 'label', //label or value
+          colors:['red','green','black','orange'],
+          pieStartAngle: 100,
+          legend: { position: 'right', alignment:'center' },
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+ 
+  <body>
+    <div id="piechart" style="width: 75%; height: 500px;"></div>
+  </body>
+
+
+
+-------------------------------------------------------------- bar.html --------------------------------------------
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{ ans| safe}});
+        
+        data.addColumn({ type: 'string', role: 'style' });
+
+        function colorGen () { 
+        var generateColor = Math.floor(Math.random() * 256 );
+        return generateColor;
+        }
+
+        for ( var i = 0; i < data.getNumberOfRows(); i += 1) {
+        rgbColor = 'rgb(' + colorGen() + ',' + colorGen() + ',' + colorGen() + ')';
+        data.setValue(i, 2, rgbColor);
+        }
+
+
+    var options = {
+        title: 'BAR CHART',
+        //   is3D: true,
+        //   pieSliceText: 'value',
+        // width: 600,
+        // height: 400,
+        bar: {groupWidth: "95%"},
+        legend: { position: 'bottom' },
+        isStacked: true,
+        hAxis: {title: 'Magnitude'},
+        vAxis: {title: 'Number of quakes'},
+        colors:['red','green','black','orange']
+        };
+
+    var chart = new google.visualization.BarChart(document.getElementById('barchart_values'));
+
+    chart.draw(data, options);
+      }
+</script>
+
+    <div id="barchart_values" style="width: 900px; height: 300px;"></div>
+
+
+-------------------------------------------------------------- line.html --------------------------------------------
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{ ans| safe }});
+
+    var options = {
+        title: ' Line chart showing Number of Earthquakes with differnet magnitudes ',
+        hAxis: { title: 'Magnitude' },
+        vAxis: { title: 'Number of quakes' },
+        pointsVisible: true,
+        //   subtitle: 'in millions of dollars (USD)'
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('linechart'));
+
+    chart.draw(data, options);
+          }
+</script>
+<body>
+  <div id="linechart" style="width: 900px; height: 500px;"></div>
+</body>
+
+
+
+
+-------------------------------------------------------------- Scatter.html --------------------------------------------
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable({{ ans| safe }});
+
+
+
+        var options = {
+        title: ' Line chart showing Number of Earthquakes with differnet magnitudes ',
+        hAxis: { title: 'Magnitude' },
+        vAxis: { title: 'Number of quakes' },
+        pointsVisible: true,
+        pointSize : 10,
+        subtitle: 'in millions of dollars (USD)',
+        legend : {position : 'bottom', alignment: 'center'},
+    };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+    </script>
+<body>
+  <div id="chart_div" style="width: 900px; height: 500px;"></div>
+</body>
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

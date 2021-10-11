@@ -1,0 +1,255 @@
+Advance Database
+Assignment - 2 
+
+
+
+Name 	: SHUBHAM SHANKAR
+UTA ID	: 1001761068
+
+
+========================================================================================================================================================================================
+QUESTION 1 + How many quakes within about 200 KM?.
+
+---------------------------- app .py ---------------------------------
+
+@app.route('/one', methods=['GET', 'POST'])
+def one():
+
+    # Requesting form
+    # requesting distance from form
+    # request latituded and longitude from form
+    latitude = math.radians(float(request.form['Latitude']))
+    print("The latitude is : ", latitude)
+
+    longitude = math.radians(float(request.form['Longitude']))
+    print(" the longitude is : ", longitude)
+
+    queryDist = float(request.form['dist'])
+    print("The query distance is : ", queryDist)
+
+    # Query to find distance
+
+    myCursor.execute("SELECT COUNT(*)  FROM EARTHQUAKE WHERE (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) <= ?",
+                     (latitude, latitude, longitude, queryDist,))
+
+    myResult = myCursor.fetchall()
+    print("my result is ", myResult)
+
+    myCursor.execute("SELECT *  FROM EARTHQUAKE WHERE (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) <= ?",
+                     (latitude, latitude, longitude, queryDist,))
+
+    allOutput = myCursor.fetchall()
+
+    return render_template('one.html', output=myResult, output1=allOutput)
+
+----------------------------------- index.html ---------------------------------------------------------
+
+<form action="/one" method="POST" enctype="multipart/form-data">
+    <h2> Question one : </h2>
+    <br>
+    <label> Enter latitude and Longitude to calculate Distance : </label>
+    <label for="Latitude"> Latitude : </label>
+    <input type="number" step="0.0000000001" id="Latitude" name="Latitude" value= 32.729641><br><br>
+
+    <label for="Longitude"> Longitude: </label>
+    <input type="number" step="0.0000000001" id="Longitude" name="Longitude" value= -97.110566><br><br> 
+
+    <label for="dist"> Distance value to be queried : </label>
+    <input type="number" step="0.0000000001" id="dist" name="dist" value= 200><br><br> 
+
+    <button type = "submit" value="Submit"> Submit </button>
+</form>
+
+
+----------------------------------------------- one.html --------------------------------------------------------------
+
+
+{% for i in output %}
+<span><h2><label>There are {{i[0]}} quakes with in a distance of 200km </label></h2></span>
+{% endfor %}
+
+
+{% for i in output1 %}
+<p>{{i}}</p>
+{% endfor %}
+
+
+
+
+========================================================================================================================================================================================
+
+QUESTION 2 • Largest quake in last week within 500 KM?
+
+---------------------------- app .py ---------------------------------
+
+@app.route('/two', methods=['GET', 'POST'])
+def two():
+
+
+    latitude = math.radians(float(request.form['Latitude']))
+    print("The latitude is : ", latitude)
+
+    longitude = math.radians(float(request.form['Longitude']))
+    print(" the longitude is : ", longitude)
+
+    queryDist = float(request.form['dist'])
+    print("The query distance is : ", queryDist)
+
+
+    # Dealing with time
+
+    time_string = "T00:00:00.000Z"
+    time_component = 'Z'
+
+    # taking the current system time
+    presentDate = datetime.now()
+    print("The present date is : ",presentDate)
+
+    # Requesting form
+    # request how many days do you want to search for the number of earthquakes(Ex. For last 2-days enter 2) from form
+    previousDay = int(request.form['userdate'])
+    print("The previous day given by user is : ", previousDay)
+    # The previous day given by user is :  7
+    previousDate = timedelta(days=previousDay)
+    print("previous Day with timedelta is : ", previousDate)
+    # previous Day with timedelta is :  7 days, 0:00:00
+
+    actualDate = presentDate - previousDate
+    actualDate = str(actualDate)
+    actualDate = actualDate.replace(" ", "T")
+    actualDate = actualDate[:-3]
+    actualDate += time_component
+
+    presentDate = str(presentDate)
+    print("The current date to string is  : ", presentDate)
+    # The current date to string is  :  2020-07-21 15:27:28.289374
+
+    presentDate = presentDate.replace(" ", "T")
+    print(" the current date with T is  : ", presentDate)
+    # the current date with T is  :  2020-07-21T15:27:28.289374
+
+    presentDate = presentDate[:-3]
+    print("sliced date is : ", presentDate)
+    # sliced date is :  2020-07-21T15:27:28.289
+
+    presentDate += time_component
+    print("the current date is : ",presentDate)
+    # 2020-07-21T15:27:28.289Z
+
+    print("current date : ",presentDate)
+    # 2020-07-21T15:27:28.289Z
+
+    print("the previous Date is : ", previousDate)
+    #  7 days, 0:00:00
+
+    print("actual wanted date : ",actualDate)
+    # 2020-07-14T15:32:17.386Z
+
+
+    myCursor.execute("SELECT MAX(\"mag\")  FROM EARTHQUAKE WHERE ( \"time\" BETWEEN ? AND ? ) AND (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) <= ?",
+                     (actualDate,presentDate,latitude, latitude, longitude, queryDist,))
+
+    myResult = myCursor.fetchone()
+    print("my result is ", myResult[0])
+    return render_template('two.html', output = myResult[0] )
+
+    # myCursor.execute("SELECT *  FROM EARTHQUAKE WHERE (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) <= ?",
+    #                  (latitude, latitude, longitude, queryDist,))
+
+
+----------------------------------- index.html ---------------------------------------------------------
+
+<br><br>
+<form action="/two" method="POST" enctype="multipart/form-data">
+    <h2> Question two : </h2>
+    <br>
+
+    <label> Enter latitude and Longitude to calculate Distance : </label>
+    <label for="Latitude"> Latitude : </label>
+    <input type="number" step="0.0000000001" id="Latitude" name="Latitude" value= 32.729641><br><br>
+
+    <label for="Longitude"> Longitude: </label>
+    <input type="number" step="0.0000000001" id="Longitude" name="Longitude" value= -97.110566><br><br> 
+
+    <label for="dist"> Distance value to be queried : </label>
+    <input type="number" step="0.0000000001" id="dist" name="dist" value= 500><br><br> 
+
+
+    <label for="userdate"> Queried date ( last week : enter 7) : </label>
+    <input type="text"  id="userdate" name="userdate" value= 7><br><br> 
+
+    <button type = "submit" value="Submit"> Submit </button>
+</form>
+
+
+----------------------------------------------- two.html --------------------------------------------------------------
+
+<h1><label>Largest quake in last week within 500 KM is<p>{{output}}</p></label></h1>
+
+
+
+========================================================================================================================================================================================
+
+QUESTION 3 • Where is closest quake with mag > 6? When?
+
+---------------------------- app .py ---------------------------------
+@app.route('/three', methods=['GET', 'POST'])
+def three():
+
+    # Requesting form
+    # request firstname from form
+    latitude = math.radians(float(request.form['Latitude']))
+    print("The latitude is : ", latitude)
+
+    longitude = math.radians(float(request.form['Longitude']))
+    print(" the longitude is : ", longitude)
+
+
+
+    myCursor.execute(" SELECT MIN( 6371 * ACOS( SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)) )) FROM (SELECT * FROM earthquake WHERE \"mag\" > 6 ) ",
+                     (latitude, latitude, longitude,))
+
+
+    myResult = myCursor.fetchone()
+    print("my result is ", myResult[0])
+
+
+
+    myCursor.execute("SELECT \"time\",\"place\" FROM EARTHQUAKE WHERE (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) = ?",
+                     (latitude, latitude, longitude,myResult[0],))
+
+
+    finalResult = myCursor.fetchall()
+
+
+    # myCursor.execute("SELECT *  FROM EARTHQUAKE WHERE (6371 * ACOS(SIN(?) * SIN(RADIANS(\"latitude\")) + COS(?) *COS(RADIANS(\"latitude\")) *COS(RADIANS(\"longitude\") - (?)))) <= ?",
+    #                  (latitude, latitude, longitude, queryDist,))
+
+    # allOutput = myCursor.fetchall()
+
+    return render_template('three.html', output=finalResult)
+
+----------------------------------- index.html ---------------------------------------------------------
+<br><br>
+<form action="/three" method="POST" enctype="multipart/form-data">
+    <h2> Question Three : </h2>
+    <br>
+    <label> Enter latitude and Longitude to calculate Distance : </label>
+    <label for="Latitude"> Latitude : </label>
+    <input type="number" step="0.0000000001" id="Latitude" name="Latitude" value= 32.729641><br><br>
+
+    <label for="Longitude"> Longitude: </label>
+    <input type="number" step="0.0000000001" id="Longitude" name="Longitude" value= -97.110566><br><br> 
+
+
+    <button type = "submit" value="Submit"> Submit </button>
+</form>
+
+
+----------------------------------------------- three.html --------------------------------------------------------------
+
+{% for i in output %}
+<p>{{i}}</p>
+{% endfor %}
+
+---------------------------------------------------------- ASSIGNMENT ENDS ---------------------------------------------------------------------------------------------------------------------

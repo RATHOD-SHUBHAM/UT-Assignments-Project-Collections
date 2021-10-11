@@ -1,0 +1,435 @@
+
+Name:	SHUBHAM SHANKAR
+Last 4 digits ID: 1068
+
+CSE 6331, Cloud Computing					
+
+
+Quiz Q1, 1.00, Summer 2 2020   (c) DL, UTA, 2020
+
+
+  C&P means cut and paste only those relevant lines from your program(s) into this quiz.
+
+
+ 1.  I understand that I am on my honor during this quiz, I will not collaborate, use 
+     non-allowed sources, and I will not discuss or share this quiz with anyone for the next 
+     12 hours.
+     You MAY: use Google to search, use previous source code, 
+     YOU MAY NOT use:
+     Email, Facebook, Hangouts, IM, chats, Skype or ANY other human connection.
+
+     ANY VIOLATIONS to scholastic honesty, which include working with others during this quiz, communicating with others during
+     this quiz, giving anyone or recieving from anyone any information during this quiz or for the next 6 hours after completion
+     of this quiz is a honors violation and will result in a -100 points being assessed for this quiz and being reported. 
+
+     This is a timed test. Late tests will have points deducted for being late.
+     Very late tests will not be graded.
+
+     When you are complete, with any part, please send the link, raise your hand, so we may visually inspect that part.
+
+     The second part of the test, you should electronically submit, you will need to copy and paste 
+     only those lines of code to implement that part of the test, usually a few (two to eight) lines of code. 
+     Place it immediately after the question.
+
+     Submit this Quiz (renamed) with code cut and pasted, ONLY text. DO NOT submit zips, binaries, libraries,
+     or anything other than text.
+
+     When any parts(questions) are complete complete, submit this test, you may make multiple submissions.
+
+     If you have computer, or other, problems, please raise your hand immediately.
+
+     If you understand and agree, please initial here:
+     _________________SS--------
+
+ 2. Get files from this same folder.
+   
+ 3. Name your program/submission with your name and last digits of your ID.
+
+ 4a. Using the cloud services provider, all functionality possible should be implemented on that provider.
+     (Of course, displaying web pages through a browser and the user interface is "local")
+
+ 4b. Upload all data files (*jpg or *png and *csv, not this quiz) to cloud service. 
+  
+Show and submit code, when each part is complete, raise your hand and then show us:
+
+ To recieve credit you MUST show (demo) AND submit the code (text only) on Canvas.
+
+ 5. Show a web page and interface (which resides on the cloud provider) with your 
+    Student ID at the top and below that, your name, at the top of every web page dispayed 
+    (for this quiz). Please use a large font.
+    For this part (question), below that please show any one of the pictures provided.
+    The cloud service provider is IBM Cloud (BlueMix).
+
+ 6. Through a web interface (page), allow user to give a picture name (file name) and you show the picture name (file name)
+    and the corresponding picture (or show "no picture available"), then below that the price and the description.
+
+ 7. (Web Page) allow a user to give a range of prices (low to high) and you show the corresponding picture, and description. 
+
+ 8. (Web page) allow a user to give a food name then modify the description, then after the description is modified,
+     you display the corresponding name, picture, and description.
+
+ 9. Allow a user to replace (with an already existing one) or remove a picture given the name.
+
+ 10. Show us, in a link, the application running and we will try it out. Only for parts 5, 6, 7, 8, 9
+
+ 10b. When complete, return (send) this quiz
+     If you finish early, send this immediately, otherwise send between
+     the end of class and no more than 1 minute after that.
+
+
+
+
+
+
+
+
+
+
+QUIZ:
+
+
+
+
+
+import os
+import shutil
+import csv
+import sys
+from flask import Flask,render_template, url_for, flash, redirect, request
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
+from flask_bootstrap import Bootstrap
+from wtforms import StringField, IntegerField, SubmitField, SelectField
+from wtforms.validators import DataRequired
+
+# packages to connect to IBM DATABASE using PYTHON
+import ibm_db
+import ibm_db_dbi
+
+import pandas as pd
+import datetime
+
+app = Flask(__name__)
+bootstrap = Bootstrap(app)
+
+# Configurations
+app.config['SECRET_KEY'] = 'blah blah blah blah'
+
+class NameForm(FlaskForm):
+	name = StringField('Name', default="Bruce Springsteen")
+	submit = SubmitField('Submit')
+
+
+# my Routes
+
+# question 1
+@app.route('/forms',methods = ['GET','POST'])
+# establishing connection with data base
+def formHandler():
+	# request firstname from form
+	name = str(request.form['fname'])
+	print("The name is : ",name)
+
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME="HSOT NAME";PORT=50000;PROTOCOL=TCPIP;UID="Your UID";", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	sql = "SELECT \"picture\" from PeopleTable where \"Name\" = \'"+name+"\'"
+	myCursor.execute(sql)
+	
+	myResult = myCursor.fetchone()
+	print(myResult)
+	outputFile = "\static\\" + myResult[0]
+	# print(" the output file is : ", myResult[0])
+	return render_template('myResult.html',output = outputFile)
+
+# question 2
+@app.route('/buttons',methods = ['GET','POST'])
+# establishing connection with data base
+def displayAll():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME="HOST NAME";PORT=50000;PROTOCOL=TCPIP;UID=UID;PWD=PWD;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+	
+	sql = ' SELECT \"picture\" from PeopleTable where \"salary\" < 99000 '
+	# sql = " SELECT \"picture\" from PeopleTable where \"salary\" > 100 "
+
+	myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print("The Result is  :  ",myResult)
+	resultAppend = []
+	# list of tuples
+	for i in myResult:
+		# tuples values and second value is always NONE.
+		for y in i:
+			if y != None:
+				outputFile = "\static\\" + y
+				resultAppend.append(outputFile)
+			else :
+				outputFile = "Image not found"
+				resultAppend.append(outputFile)
+	return render_template('myResult2.html',output = resultAppend)
+
+
+# Question 4
+@app.route('/four',methods = ['GET','POST'])
+# establishing connection with data base
+def deletePerson():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	sql = " DELETE FROM PeopleTable where \"Name\" = \'dave\' "
+	myCursor.execute(sql)
+	
+	sql = 'SELECT * FROM PeopleTable '
+	# sql = " SELECT \"picture\" from PeopleTable where \"salary\" > 100 "
+	myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print("The Result is  :  ",myResult)
+	return render_template('myResult4.html',output = myResult)
+
+
+# question 5
+@app.route('/five',methods = ['GET','POST'])
+# establishing connection with data base
+def changeKeyword():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+	
+	sql = "UPDATE PeopleTable SET \"keywords\"=\'Not so nice anymore\' where \"Name\"=\'jason\'"
+	myCursor.execute(sql)
+
+	sql = "select * from PeopleTable"
+	myCursor.execute(sql)
+	
+
+	myResult = myCursor.fetchall()
+	# print(myResult)
+	
+	return render_template('myResult5.html',output = myResult)
+
+
+# question 6
+@app.route('/six',methods = ['GET','POST'])
+# establishing connection with data base
+def changeSalary():
+	salary = float(request.form['salary'])
+	print("The salary is : ",salary)
+
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+	
+	sql = " UPDATE PeopleTable SET \"salary\" = \'"+str(salary)+"\' where \"Name\" = \'someone\' "
+	myCursor.execute(sql)
+
+	sql = "SELECT \"Name\",\"salary\" from PeopleTable"
+	myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print(myResult)
+
+
+	return render_template('myResult6.html',output = myResult)
+
+# QUIZ QUESTION 5
+@app.route('/quiz5',methods = ['GET','POST'])
+# establishing connection with data base
+def quiz5():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=Host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	return render_template('quiz5result.html')
+
+# Quiz Question 6 :
+@app.route('/quiz6',methods = ['GET','POST'])
+# establishing connection with data base
+def quiz6():
+	# request firstname from form
+	name = str(request.form['picName'])
+	
+
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	sql = "SELECT \"Picture\",\"Price\",\"Description\" from FoodTable where \"Picture\" = \'"+name+"\'"
+	myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print(myResult)
+	myStr = "\static\\"+name
+	# outputFile = "\static\\" + myResult[0]
+	# print(" the output file is : ", myResult[0])
+	return render_template('myQuiz6.html',output1 = myResult[0][1],output2=myResult[0][2],picture = myStr,fruitName=name)
+
+
+# quiz 7 : 
+@app.route('/quiz7',methods = ['GET','POST'])
+# establishing connection with data base
+def quiz7():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=host;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+
+	# request firstname from form
+	maxPrice = int(request.form['maxprice'])
+	minPrice = int(request.form['minprice'])
+
+	diff = (maxPrice - minPrice)+1
+	
+	for i in range(minPrice,maxPrice):
+		print(i)
+		price = str(i)
+		sql = "SELECT \"Picture\",\"Description\" from FoodTable where \"Price\" = \'"+price+"\'"
+		myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print(myResult)
+	if (myResult[0][0] != None):
+		outputFile = "\static\\" + myResult[0][0]
+		print(" the output file is : ", myResult[0][0])
+		return render_template('myQuiz7.html',output = outputFile)
+
+
+
+
+# quiz 8 : 
+@app.route('/quiz8',methods = ['GET','POST'])
+# establishing connection with data base
+def quiz7():
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=HOST;PORT=50000;PROTOCOL=TCPIP;UID=uid;PWD=pwd;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	name = str(request.form['name'])
+	desc = str(request.form['desc'])
+
+
+	# request firstname from form
+	maxPrice = int(request.form['maxprice'])
+	minPrice = int(request.form['minprice'])
+
+
+	sql = "UPDATE FoodTable SET \"Description\" = \'str(desc)+"
+		myCursor.execute(sql)
+	
+	myResult = myCursor.fetchall()
+	print(myResult)
+	if (myResult[0][0] != None):
+		outputFile = "\static\\" + myResult[0][0]
+		print(" the output file is : ", myResult[0][0])
+		return render_template('myQuiz7.html',output = outputFile)
+
+
+
+
+
+# QUIZ QUESTION 9
+@app.route('/quiz9',methods = ['GET','POST'])
+# establishing connection with data base
+def quiz9():
+	name = str(request.form['RR'])
+	# connect using ibm_db_dbi. Attempt to establish A connection with uncataloged database.
+	# using service credentials
+	conn = ibm_db_dbi.connect(
+		"DATABASE=BLUDB;HOSTNAME=HOST;PORT=50000;PROTOCOL=TCPIP;UID=UID;PWD=PWD;", "", ""
+		)
+	# fetch data using ibm_db_dbi
+	myCursor = conn.cursor()
+
+	sql = "UPDATE FoodTable SET \"Picture\" = \
+
+	return render_template('quiz5result.html')
+
+
+
+
+# ROUTES!
+@app.route('/',methods=['GET','POST'])
+def index():
+	form = NameForm()
+	if form.validate_on_submit():
+		name = form.name.data
+		return render_template('index.html',form=form,name=name)
+	return render_template('index.html',form=form,name=None)
+
+@app.route('/help')
+def help():
+	text_list = []
+	# Python Version
+	text_list.append({
+		'label':'Python Version',
+		'value':str(sys.version)})
+	# os.path.abspath(os.path.dirname(__file__))
+	text_list.append({
+		'label':'os.path.abspath(os.path.dirname(__file__))',
+		'value':str(os.path.abspath(os.path.dirname(__file__)))
+		})
+	# OS Current Working Directory
+	text_list.append({
+		'label':'OS CWD',
+		'value':str(os.getcwd())})
+	# OS CWD Contents
+	label = 'OS CWD Contents'
+	value = ''
+	text_list.append({
+		'label':label,
+		'value':value})
+	return render_template('help.html',text_list=text_list,title='help')
+
+@app.errorhandler(404)
+@app.route("/error404")
+def page_not_found(error):
+	return render_template('404.html',title='404')
+
+@app.errorhandler(500)
+@app.route("/error500")
+def requests_error(error):
+	return render_template('500.html',title='500')
+
+port = int(os.getenv('PORT', '3000'))
+app.run(host='0.0.0.0', port=port)
