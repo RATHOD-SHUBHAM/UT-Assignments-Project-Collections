@@ -1,6 +1,6 @@
 # UT-Assignments-Project-Collections
 
-<p style="text-align:center;"> Here is a collection of all of my <b>Assignments</b> and <b>Projects</b> during my <b>Two-Year Master's Program</b>.</p>
+    Here is a collection of all of my <b>Assignments</b> and <b>Projects</b> during my <b>Two-Year Master's Program</b>.
 
 ## Course:
   1. ADVANCED TOPICS IN DATABASE SYSTEMS (Advance DataBase Systems) & CLOUD COMPUTING.
