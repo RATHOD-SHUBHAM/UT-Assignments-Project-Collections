@@ -1,0 +1,365 @@
+
+Name:SHUBHAM SHANKAR
+Last 4 digits ID:1001761068
+
+CSE 6331, Cloud Computing					
+
+Quiz Q4, 1.00, Summer 2020   (c) DL, UTA, 2020
+
+
+  C&P means cut and paste only those relevant lines from your program(s) into this quiz.
+
+ 1.  I understand that I am on my honor during this quiz, I will not collaborate, use 
+     non-allowed sources, and I will not discuss or share this quiz with anyone for the next 
+     12 hours.
+     You MAY: use Google to search, use previous source code, 
+     YOU MAY NOT use:
+     Email, Facebook, Hangouts, IM, chats, Skype or ANY other human connection.
+
+     ANY VIOLATIONS to scholastic honesty, which include working with others during this quiz, communicating with others during
+     this quiz, giving anyone or recieving from anyone any information during this quiz or for the next 6 hours after completion
+     of this quiz is a honors violation and will result in a -100 points being assessed for this quiz and being reported. 
+
+     This is a timed test. Late tests will have points deducted for being late.
+     Very late tests will not be graded.
+
+     When you are complete, with any part, please send the link, raise your hand, so we may visually inspect that part.
+
+     The second part of the test, you should electronically submit, you will need to copy and paste 
+     only those lines of code to implement that part of the test, usually a few (two to eight) lines of code. 
+     Place it immediately after the question.
+
+     Submit this Quiz (renamed) with code cut and pasted, ONLY text. DO NOT submit zips, binaries, libraries,
+     or anything other than text.
+
+     When any parts(questions) are complete complete, submit this test, you may make multiple submissions.
+
+     If you have computer, or other, problems, please raise your hand immediately.
+
+     If you understand and agree, please initial here:
+     _________________SS
+
+ 2. Get files from this same folder.
+   
+ 3. Name your program/submission with your name and last digits of your ID.
+
+ 4a. Using the cloud services provider, all functionality possible should be implemented on that provider.
+     (Of course, displaying web pages through a browser and the user interface is "local")
+
+ 4b. Upload all data files (*csv, not this quiz) to cloud service. 
+  
+Show and submit code, when each part is complete, raise your hand and then show us:
+
+ To recieve credit you MUST show (demo) AND submit the code (text only) on Canvas.
+
+  5. Show a web page and interface (which resides on the cloud provider) with your name,
+     and below that, Student ID at the top of every web page dispayed 
+     (for this quiz). 
+     Please use a large font.
+    
+     The cloud service providers are IBM Cloud (BlueMix), Microsoft Azure, Amazon AWS. You may use any you wish.
+
+    Import the datasets into a Relational Data Base (SQL), if you have already done this, (briefly) explain/describe
+    how you did this. Please note that for some parts of the following you will need to create indexes (keys)
+    appropriately.
+
+	Answer : I went to azure data studio. There i connected to my azure account. and then i added my csv file giving my credentials on datastudio.
+
+
+
+ 6. Allow a user, through a web form, to give a state name, and show a point chart (scatter diagram)  
+    where the X axis is the year and the Y axis is the population. 
+    Please scale so that it fits on the screen, occupying between 70 to 80% of the screen width.
+    Please label both axis.
+
+Answer : 
+@app.route('/quiz6', methods=['GET','POST'])
+def quiz5():
+
+    stateName = request.args.get('stateName')
+    print("the state  is : ", stateName)
+    print(type(stateName))
+    
+    # select Max value to split
+    sql = "select * from year where \"state\" = \'"+stateName+"\'; "
+    print(sql)
+    cursor.execute(sql)
+    myResult = cursor.fetchall()
+    print("The result is : ",myResult)
+
+
+    rows = []
+    rows = list([['Year', 'Population']])
+    rows.append(list([str(2010)+"-",myResult[0][1]]))
+    rows.append(list([str(2011)+"-",myResult[0][2]]))
+    rows.append(list([str(2012)+"-",myResult[0][3]]))
+    rows.append(list([str(2013)+"-",myResult[0][4]]))
+    rows.append(list([str(2014)+"-",myResult[0][5]]))
+    rows.append(list([str(2015)+"-",myResult[0][6]]))
+    rows.append(list([str(2016)+"-",myResult[0][7]]))
+    rows.append(list([str(2017)+"-",myResult[0][8]]))
+    rows.append(list([str(2018)+"-",myResult[0][9]]))
+    
+    return render_template("quiz15.html", output = rows)
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable({{ output| safe }});
+
+
+
+        var options = {
+        title: ' Point chart  ',
+        hAxis: { title: 'Year' },
+        vAxis: { title: 'Population' },
+        pointsVisible: true,
+        pointSize : 10,
+        subtitle: 'in millions of dollars (USD)',
+        legend : {position : 'top', alignment: 'center'},
+    };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+    </script>
+<body>
+  <div id="chart_div" style="width: 90%; height: 500px;"></div>
+</body>
+
+<h2>
+    Quiz Question - 6
+</h2>
+<form action="/quiz6" method="get" enctype="multipart/form-data">
+    <label>Enter State Name: </label><br />
+    <input type="text" name="stateName" value= "Texas"><br /><br>
+
+    <button type = "submit" value="Submit"> Submit </button><br /><br />
+</form>
+
+
+ 7. Allow a user, through a web form, to give from 2 to 6 state names, and a year, then display a pie chart 
+    where each pie slice is a percentage of the total population for those given states.
+    The pie chart should occupy half the screen, each slice with labels outside the slice, each in a 
+    different color.
+Answer : 
+
+@app.route('/quiz7', methods=['GET','POST'])
+def quiz7():
+    
+    
+    stateOne = str(request.args.get('one'))
+    stateTwo = str(request.args.get('two'))
+    stateThree = str(request.args.get('three'))
+    stateFour = str(request.args.get('four'))
+    stateFive = str(request.args.get('five'))
+    stateSix = str(request.args.get('six'))
+
+    states=[]
+    states.append(stateone)
+    states.append(statetwo)
+    states.append(statethree)
+    states.append(statefour)
+    states.append(statefive)
+    states.append(statesix)
+  
+    rows = []
+    rows = list([['state', 'population']])
+
+    year = request.args.get('year')
+    
+    
+    for i in states:
+        if(i!="None"):
+            sql = "select \"" + year + "\" from year where state='"+i+"';"
+            print(sql)
+            cursor.execute(sql)
+            myResult = cursor.fetchall()
+            rows.append(list([i,myResult[0][0]]))
+           
+
+    return render_template("quiz17.html", output = rows)
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{output|tojson}});
+
+        var options = {
+          title: 'Solution'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+ 
+  <body>
+    <div id="piechart" style="width: 80%; height: 900px;"></div>
+  </body>
+
+<h2>Question 7</h2>
+<form action="/quiz7" method="get" enctype="multipart/form-data">
+    
+    <label >State 1 :</label><br>
+    <input type="text" name="one"><br><br>
+
+    <label >State 2 :</label><br>
+    <input type="text" name="two" ><br><br>
+
+    <label >State 3 :</label><br>
+    <input type="text" name="three" ><br><br>
+
+    <label >State 4 :</label><br>
+    <input type="text" name="four" ><br><br>
+
+    <label >State 5 :</label><br>
+    <input type="text" name="five" ><br><br>
+
+    <label >State 6 :</label><br>
+    <input type="text" name="six" ><br><br>
+    
+    
+    <label for="year">Year  :</label><br>
+    <input type="number" name="year" ><br>
+    
+
+    <button type = "submit" value="Submit"> Submit </button><br><br>
+
+
+ 8. Please show a page, followed by a bar chart on that page, where the user, through a web form, 
+    will give from 2 to 12 state names, and a year, then display a horizontal bar chart with labels
+    inside each bar for each state and its population.
+
+@app.route('/quiz7', methods=['GET','POST'])
+def quiz7():
+    
+    
+    stateOne = str(request.args.get('one'))
+    stateTwo = str(request.args.get('two'))
+    stateThree = str(request.args.get('three'))
+    stateFour = str(request.args.get('four'))
+    stateFive = str(request.args.get('five'))
+    stateSix = str(request.args.get('six'))
+    stateSeven = str(request.args.get('seven'))
+    stateeight = str(request.args.get('eight'))
+    statenine = str(request.args.get('nine'))
+    stateten = str(request.args.get('ten'))
+    stateele = str(request.args.get('ele'))
+    statetwe = str(request.args.get('twe'))
+
+    states=[]
+    states.append(stateone)
+    states.append(statetwo)
+    states.append(statethree)
+    states.append(statefour)
+    states.append(statefive)
+    states.append(statesix)
+
+
+
+ 
+    rows = []
+    rows = list([['state', 'population']])
+
+    year = request.args.get('year')
+    
+    
+    for i in states:
+        if(i!="None"):
+            sql = "select \"" + year + "\" from year where state='"+i+"';"
+            print(sql)
+            cursor.execute(sql)
+            myResult = cursor.fetchall()
+            rows.append(list([i,myResult[0][0]]))
+           
+
+    return render_template("quiz17.html", output = rows)
+
+
+<h2>Question 7</h2>
+<form action="/quiz7" method="get" enctype="multipart/form-data">
+    
+    <label >State 1 :</label><br>
+    <input type="text" name="one"><br><br>
+
+    <label >State 2 :</label><br>
+    <input type="text" name="two" ><br><br>
+
+    <label >State 3 :</label><br>
+    <input type="text" name="three" ><br><br>
+
+    <label >State 4 :</label><br>
+    <input type="text" name="four" ><br><br>
+
+    <label >State 5 :</label><br>
+    <input type="text" name="five" ><br><br>
+
+    <label >State 6 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 7 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 8 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 9 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 10 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 11 :</label><br>
+    <input type="text" name="six" ><br><br>
+
+    <label >State 12 :</label><br>
+    <input type="text" name="six" ><br><br>
+    
+    
+    <label for="year">Year  :</label><br>
+    <input type="number" name="year" ><br>
+    
+
+    <button type = "submit" value="Submit"> Submit </button><br><br>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{output|tojson}});
+
+        var options = {
+          title: 'Solution'
+        };
+
+        var chart = new google.visualization.BarChart(document.getElementById('barchart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+ 
+  <body>
+    <div id="barchart" style="width: 80%; height: 900px;"></div>
+  </body>
+
+
+ 9. Show us, in a link, the application running and we will try it out. Only for parts 6, 7, 8
+
+ 10. When complete, return (send) this quiz
+     If you finish early, send this immediately, otherwise send between
+     the end of class and no more than 1 minute after that.
+

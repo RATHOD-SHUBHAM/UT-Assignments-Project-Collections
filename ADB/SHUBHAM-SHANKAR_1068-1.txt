@@ -1,0 +1,283 @@
+
+
+Advance Database
+Assignment - 3 
+
+
+
+Name 	: SHUBHAM SHANKAR
+UTA ID	: 1001761068
+
+========================================================================================================================================================================================
+
+
+1. A number of random queries, inserts, deletes (up to 1000 queries/commands
+of random tuples in the dataset)
+3. Measure time expended to perform these queries.
+4. Show results.
+
+Answer : 
+
+ ----------------- app.py ------------------------
+
+@app.route('/one', methods=['GET','POST'])
+def rand():
+    if request.method == 'POST':
+        num = int(request.form['num'])
+        start_time = time.time()
+
+        # num is a interger value
+        for i in range(0, num):
+
+            sql = "SELECT mag FROM quake ;"
+            cursor.execute(sql)
+        end_time = time.time()
+        time_diff = end_time - start_time
+
+        return render_template("one.html", time=time_diff, num=num)
+
+----------------------------------- -------------------------------- Index.html:  ------------------------- -------------------------------
+
+     <form method="POST" action="/one" enctype="multipart/form-data">
+            <h2> --------- Question One -------- : </h2><br><br>
+            <h2><label>Random Queries that are not Restricted</label></h2><br>
+
+            <label for = "num">Enter The number of times you want to be queried: </label><br>
+            <input type="text" name="num" value = 3><br><br> 
+            
+            <button type = "submit" value="Submit"> Search </button>
+        </form>
+        <br><br>
+
+ -------------------------------------------------------------- one.html --------------------------------------------
+
+{% extends "base.html" %}
+{% block content %}
+
+      <h3> Time taken to run {{num}} queries is: {{time}} </h3>
+      <br><br>
+      <h2> <a href = "/">Home Page</a> </h2>
+
+{% endblock content %}
+
+
+========================================================================================================================================================================================
+
+2. A restricted set of queries, similar to previous (1.) but where selection is
+restricted (ie only occurring in CA, or within N<100 km of a specified
+lat,long location.
+Or: a time range, or a magnitude range.
+3. Measure time expended to perform these queries.
+4. Show results.
+
+Answer : 
+ ----------------- app.py ------------------------
+
+@app.route('/two', methods=['POST'])
+def restrand():
+    num = int(request.form['num'])
+    start_time = time.time()
+    for i in range(0, num):
+        mag = random.uniform(0.5, 6.5)
+        mag = float("{0:.2f}".format(mag))
+        sql = " select * from quake where \"mag\" = \'" + str(mag) + "\' and \"gap\" between 50 and 100 "
+        cursor.execute(sql)
+    end_time = time.time()
+    time_diff = end_time - start_time
+    return render_template("two.html", time=time_diff, num=num)
+
+
+----------------------------------- -------------------------------- Index.html:  ------------------------- -------------------------------
+
+
+ <form method="POST" action="/two" enctype="multipart/form-data">
+            <h1> ---------------- Question Two ---------- </h1><br>
+            <label><h2>Random Queries (Restricted) </h2></label><br>
+
+            <label>Enter The number of times you want to be queried: </label>
+            <input type="text" name="num" value = 3><br><br> 
+            
+            <button type = "submit" value="Submit"> Search </button>
+        </form>
+        <br><br>
+
+
+
+-------------------------------------------------------------- two.html --------------------------------------------
+
+
+{% extends "base.html" %}
+{% block content %}
+
+      <header> <h1> Time taken to run {{num}} queries is: {{time}} </h1> </header>
+      <br>
+      <h2> <a href = "/">Home Page</a> </h2>
+
+{% endblock content %}
+
+========================================================================================================================================================================================
+
+5. Then, installing and using either memcache or Redis repeat steps 1 through 4.
+
+Answer : PART A:
+
+ ----------------- app.py ------------------------
+
+# Randrange function begins here.
+
+def randrange(rangfro=None,rangto=None,num=None):
+    # start time
+    start = time.time()
+
+    # loop through
+    for i in range(0,num):
+        mag= round(random.uniform(rangfro, rangto),1)
+        print(" the mag value is : ", mag)
+        # round(number, digits)
+        # number	Required. The number to be rounded
+        # digits	Optional. The number of decimals to use when rounding the number. Default is 0
+
+
+        sql=" SELECT * from quake where \"mag\" > \'"+str(mag)+"\' "
+        
+        # Compute the hash key
+        hash = hashlib.sha224(sql.encode('utf-8')).hexdigest()
+        key = "redis_cache:" + hash
+
+
+        if (red.get(key)):
+           print("redis cached")
+        else:
+           # Do MySQL query
+           cursor.execute(sql)
+           myResult = cursor.fetchall()
+           rows = []
+           for i in myResult:
+                rows.append(str(i))
+
+           # Put data into cache for 1 hour
+           red.set(key, pickle.dumps(list(rows)) )
+           red.expire(key, 36)
+
+        cursor.execute(sql)
+    end = time.time()
+    exectime = end - start
+    return render_template('count.html', t=exectime)
+
+@app.route('/multiplerun', methods=['POST'])
+def randquery():
+    # rangfro = float(request.args.get('rangefrom'))
+    # rangto = float(request.args.get('rangeto'))
+    # num = request.args.get('nom')
+
+    rangfro = float(request.form['rangefrom'])
+    rangto = float(request.form['rangeto'])
+    num = int(request.form['nom'])
+    # Take all the input and pass it to the function
+    return randrange(rangfro,rangto,num)
+
+
+----------------------------------- -------------------------------- Index.html:  ------------------------- -------------------------------
+
+ <form action="/multiplerun" method="POST" enctype="multipart/form-data">
+            <h1> -------------- using Redis ------------- </h1>
+            <label>Magnitude Range from</label><br>
+            <input type="text" name="rangefrom" value = 1 maxlength="200" width="60"><br><br>
+
+            <label>Magnitude Range To</label><br>
+            <input type="text" name="rangeto" value = 3  maxlength="200" width="60"><br><br>
+
+            <label>Number of queries to run:</label><br>
+            <input type="text" name="nom"  value = 4 maxlength="200" width="60"><br><br>
+            <button type = "submit" value="Submit"> query with cache </button>
+  </form>
+
+
+-------------------------------------------------------------- count.html --------------------------------------------
+
+{% extends "base.html" %}
+{% block content %}
+<h1>Time to run Queries</h1>
+  <h3><p>{{t}}</p></h3>
+{% endblock content %}
+
+
+-------------------------------------------------------------------PART B----------------------------------------------------------------------------------------------------------------------------------
+
+------------------------------ app.py -----------------------
+# Multi run 2 begin
+
+# Randrange function begins here.
+
+def randrangetwo(num=None):
+    # start time
+    start = time.time()
+
+    # loop through
+    for i in range(0,num):
+        # mag= round(random.uniform(rangfro, rangto),1)
+        # print(" the mag value is : ", mag)
+        # round(number, digits)
+        # number	Required. The number to be rounded
+        # digits	Optional. The number of decimals to use when rounding the number. Default is 0
+
+
+        sql=" SELECT * from quake where \"mag\" > 2.4 "
+        
+        # Compute the hash key
+        hash = hashlib.sha224(sql.encode('utf-8')).hexdigest()
+        key = "redis_cache:" + hash
+
+
+        if (red.get(key)):
+           print("redis cached")
+        else:
+           # Do MySQL query
+           cursor.execute(sql)
+           myResult = cursor.fetchall()
+           rows = []
+           for i in myResult:
+                rows.append(str(i))
+
+           # Put data into cache for 1 hour
+           red.set(key, pickle.dumps(list(rows)) )
+           red.expire(key, 36)
+
+        cursor.execute(sql)
+    end = time.time()
+    exectime = end - start
+    return render_template('count1.html', t=exectime)
+
+@app.route('/multipleruntwo', methods=['POST'])
+def randquerytwo():
+    num = int(request.form['nom'])
+    # Take all the input and pass it to the function
+    return randrangetwo(num)
+
+
+----------------------------------- -------------------------------- Index.html:  ------------------------- -------------------------------
+
+  <form action="/multipleruntwo" method="POST" enctype="multipart/form-data">
+        <h1> -------------- using Redis question two------------- </h1>
+    
+        <label>Number of queries to run:</label><br>
+        <input type="text" name="nom"  value = 4 maxlength="200" width="60"><br><br>
+        <button type = "submit" value="Submit"> query with cache </button>
+  </form>
+ 
+-------------------------------------------------------------- count1.html --------------------------------------------
+
+
+{% extends "base.html" %}
+{% block content %}
+<h1>Time to run Queries</h1>
+  <h3><p>{{t}}</p></h3>
+{% endblock content %}
+
+-------------------------------------------------------------------------- END ASSIGNMENT ------------------------------------------------------------------------
+
+
+
+
+
+

@@ -1,0 +1,230 @@
+
+Name: shubham shankar
+Last 4 digits ID:1068
+
+CSE 6331, Cloud Computing					
+
+Quiz Q Optional,Bonus, 1.00, Summer 2020   (c) DL, UTA, 2020
+
+
+  C&P means cut and paste only those relevant lines from your program(s) into this quiz.
+
+ 1.  I understand that I am on my honor during this quiz, I will not collaborate, use 
+     non-allowed sources, and I will not discuss or share this quiz with anyone for the next 
+     12 hours.
+     You MAY: use Google to search, use previous source code, 
+     YOU MAY NOT use:
+     Email, Facebook, Hangouts, IM, chats, Skype or ANY other human connection.
+
+     ANY VIOLATIONS to scholastic honesty, which include working with others during this quiz, communicating with others during
+     this quiz, giving anyone or recieving from anyone any information during this quiz or for the next 6 hours after completion
+     of this quiz is a honors violation and will result in a -100 points being assessed for this quiz and being reported. 
+
+     This is a timed test. Late tests will have points deducted for being late.
+     Very late tests will not be graded.
+
+     When you are complete, with any part, please send the link, raise your hand, so we may visually inspect that part.
+
+     The second part of the test, you should electronically submit, you will need to copy and paste 
+     only those lines of code to implement that part of the test, usually a few (two to eight) lines of code. 
+     Place it immediately after the question.
+
+     Submit this Quiz (renamed) with code cut and pasted, ONLY text. DO NOT submit zips, binaries, libraries,
+     or anything other than text.
+
+     When any parts(questions) are complete complete, submit this test, you may make multiple submissions.
+
+     If you have computer, or other, problems, please raise your hand immediately.
+
+     If you understand and agree, please initial here:
+     _________________SS
+
+ 2. Get files from this same folder.
+   
+ 3. Name your program/submission with your name and last digits of your ID.
+
+ 4a. Using the cloud services provider, all functionality possible should be implemented on that provider.
+     (Of course, displaying web pages through a browser and the user interface is "local")
+
+ 4b. Upload all data files (not this quiz) to cloud service. 
+  
+Show and submit code, when each part is complete, raise your hand and then show us:
+
+ To recieve credit you MUST show (demo) AND submit the code (text only) on Canvas.
+
+  5. Show a web page and interface (which resides on the cloud provider) with your name,
+     and below that, Student ID at the top of every web page dispayed 
+     (for this quiz). 
+     Please use a large font.
+    
+     The cloud service providers are IBM Cloud, Microsoft Azure or Amazon AWS. You may use any, as you wish.
+
+  6. One of the common methods to rank the readability of text is the Flesch reading-ease test, which ranks text
+     by the formula
+     Readability = 206.835 - (1.015 x total_number_words/total_number_sentences) - (84.6 x total_number_syllables/total_number_words)
+     where a Readability score of
+     100 to 90 is 5th grade
+     90 to 80 is 6th grade
+     80 to 70 is 7th grade
+     70 to 60 is 8th an 9th grade
+     60 to 50 is 10th to 12th grade
+     50 to 30 is college
+     30 to 10 is college graduate
+     10 to 0 is professional
+     
+     where sentences end with any of ".?!", and syllable count can for a word can be approximated by counting the vowels
+     "aeiou" and NOT counting the "e" at the end of a word. Vowels that appear adjacent to another vowel, 
+     such as the "ea" in "read", only count as one vowel.
+
+     In a text box, a user will enter some text, you will calculate and display the Flesch score for that text, 
+     and also show the N words with the largest total_number_syllables, as well as the total_number_words, total_number_sentences,
+     and total_number_syllables for the entire text. Show the reading level for that Flesch score.
+
+
+def syllable_count(word):
+    word = word.lower()
+    count = 0
+    vowels = "aeiou"
+    if word[0] in vowels:
+        count += 1
+    for index in range(1, len(word)):
+        if word[index] in vowels and word[index - 1] not in vowels:
+            count += 1
+    if word.endswith("e"):
+        count -= 1
+    if count == 0:
+        count += 1
+    return count
+
+print(syllable_count('HAIRY'))  # prints "2"
+
+
+
+@application.route('/quiz1',methods=['GET','POST'])
+def quiz1():
+
+    text = request.args.get('txt')
+
+    text = text.replace('. ', '@ ')
+    text = text.replace('? ', '@ ')
+    text = text.replace('!', '@ ')
+    splitWord= text.split('@')
+    total_number_sentences = len(splitWord)
+    print(total_number_sentences)
+   
+
+    # splitWord = text.split()
+    print("\n\n\n")
+    print("the words are : ",splitWord)
+
+    word = []
+
+    for i in splitWord:
+        i = i.split(' ')
+        word.append(i)
+
+    split1 = []
+
+    for i in word:
+        for j in i:
+            split1.append(j)
+    while("" in split1):
+        split1.remove("")
+
+    count = (len(split1))
+
+    sy_count = 0
+    myList_syllable = []
+    for i in split1:
+        temp = syllable_count(i)
+        myList_syllable.append([i,temp])
+        sy_count =sy_count+  temp
+    total_syllable_count = sy_count
+    print(total_syllable_count)
+    Readability = 206.835 - (1.015 * count/total_number_sentences) - (84.6 * total_syllable_count/count)
+    print("\n\n")
+    print(Readability)
+
+    if Readability > 90:
+        Readability_Score = "5th grade"
+    elif Readability < 90 and Readability > 80:
+        Readability_Score = "6th grade"
+    elif Readability < 80 and Readability > 70:
+        Readability_Score = "7th grade"
+    elif Readability < 70 and Readability > 60:
+        Readability_Score = "8th 9th grade"
+    elif Readability < 60 and Readability > 50:
+        Readability_Score = "10th 12th grade"
+    elif Readability < 50 and Readability > 30:
+        Readability_Score = "college"
+    elif Readability < 30 and Readability > 10:
+        Readability_Score = "college graduate"
+    elif Readability < 10 and Readability > 0:
+        Readability_Score = "professional"    
+
+
+    print("\n\n")
+    print(split1)
+
+    num = int(request.args.get('num'))
+    print(num)
+
+    print("\n\n")
+    print(myList_syllable)
+
+    def Sort(sub_li): 
+        l = len(sub_li) 
+        for i in range(0, l): 
+            for j in range(0, l-i-1): 
+                if (sub_li[j][1] > sub_li[j + 1][1]): 
+                    tempo = sub_li[j] 
+                    sub_li[j]= sub_li[j + 1] 
+                    sub_li[j + 1]= tempo 
+        return sub_li 
+
+    sub_li = myList_syllable
+    print("\n\n")
+    sub_li = Sort(sub_li)[-num:]
+    print(sub_li.reverse())
+
+    return render_template('quiz1.html',output = total_number_sentences,count = count,op = Readability_Score,op1= total_syllable_count,op2=Readability,op3 =sub_li)
+
+<h2><label>total_number_of_words is : </label><p>{{count}}</p></h2>
+<br><br>
+<h2><label>total_number_sentences : </label><p>{{output}}</p></h2>
+<br><br>
+<h2><label>total_syllable_count</label>{{op1}}</h2>
+<br><br>
+<h2><label>the Readability_score: </label>{{op2}}</h2>
+<br><br>
+<h2><label>Readability_level :  </label>{{op}}</h2>
+<br><br>
+<h2><label>sublist with ovels count :  </label></h2>
+<p>{{op3}}</p>
+
+
+<h2>Quiz - 1 </h2>
+<form action="/quiz1" method="get">
+    <label for= "txt">Enter text here : </label><br />
+    <input type="text" id="cha" name="txt" ><br><br>
+
+    <label>Enter the N value : </label><br>
+    <input type="number" name="num" value = 5><br>
+
+    <button type = "submit" value="Submit"> Submit </button><br><br>
+</form>
+
+  7. To improve readability, words with the largest number of syllables need to be rewritten. Display those words in the text,
+     highlighted in red, and allow a user to modify each word, one at a time, and then show recalculated score, 
+     as in the previous question.
+
+  8. A pie chart might be easier to read and understand.
+     Modify questions 6 and 7 to include pie charts for: 1. number (percent) words with different syllable count, and
+     2. number of words per sentence, for all sentences (These are different pie charts.)
+  
+  9. Show us, in a link, the application running and we will try it out. Only for parts 6, 7, 8
+
+ 10. When complete, return (send) this quiz
+     If you finish early, send this immediately, otherwise send between
+     the end of class and no more than 1 minute after that.
+
